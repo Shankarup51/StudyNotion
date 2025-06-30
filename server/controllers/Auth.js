@@ -1,4 +1,4 @@
-const USer = require("../models/User");
+const User = require("../models/User");
 const OTP = require("../models/OTP");
 const otpGenerator = require("otp-generator");
 const bcrypt = require("bcrypt");
@@ -20,7 +20,7 @@ exports.sendOTP = async (req, res) => {
         const { email } = req.body;
 
         //check if user already exist
-        const checkUserPresent = await USer.findOne({ email });
+        const checkUserPresent = await User.findOne({ email });
 
         //if user already exist , then return a response 
         if (checkUserPresent) {
@@ -113,7 +113,7 @@ exports.signUp = async (req, res) => {
         }
         //check user already exist or not
 
-        const existingUser = await USer.findOne({ email });
+        const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(401).json({
                 success: false,
@@ -197,7 +197,7 @@ exports.login = async (req, res) => {
         }
 
         //user chack exist or not
-        const user = await USer.findOne({ email }).populate("additionalDetails");
+        const user = await User.findOne({ email }).populate("additionalDetails");
         if (!user) {
             return res.status(401).json({
                 success: false,
