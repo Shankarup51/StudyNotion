@@ -229,88 +229,88 @@ exports.login = async (req, res) => {
                 message: "logged in successfully"
             })
         }
-        else{
+        else {
             return res.status(400).json({
-                success:false,
-                message:"invalid  password"
+                success: false,
+                message: "invalid  password"
             })
         }
     }
     catch (error) {
         console.log(error);
         return res.status(500).json({
-            success:  false,
+            success: false,
             message: "something went wrong",
             error
-        }); 
+        });
     }
 }
 
 //changepassword
 exports.changePassword = async (req, res) => {
-  try {
-    const { oldPassword, newPassword, confirmPassword } = req.body;
+    try {
+        const { oldPassword, newPassword, confirmPassword } = req.body;
 
-    // Check all fields
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      return res.status(403).json({
-        success: false,
-        message: "All fields are required"
-      });
-    }
+        // Check all fields
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            return res.status(403).json({
+                success: false,
+                message: "All fields are required"
+            });
+        }
 
-    // New password match check
-    if (newPassword !== confirmPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "New password and confirm password do not match"
-      });
-    }
+        // New password match check
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "New password and confirm password do not match"
+            });
+        }
 
-    // Find user
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found"
-      });
-    }
+        // Find user
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
 
-    // Compare old password
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Old password is incorrect"
-      });
-    }
+        // Compare old password
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(401).json({
+                success: false,
+                message: "Old password is incorrect"
+            });
+        }
 
-    // Hash and update password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-    await user.save();
+        // Hash and update password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
 
-    // Send confirmation email
-    await mailSender(
-      user.email,
-      "Your StudyNotion Password Has Been Changed",
-      `<h2>Hello ${user.firstName || "there"},</h2>
+        // Send confirmation email
+        await mailSender(
+            user.email,
+            "Your StudyNotion Password Has Been Changed",
+            `<h2>Hello ${user.firstName || "there"},</h2>
       <p>Your password was successfully changed on ${new Date().toLocaleString()}.</p>
       <p>If this was not you, please reset your password or contact our support team immediately.</p>
       <p>– Team StudyNotion</p>`
-    );
+        );
 
-    return res.status(200).json({
-      success: true,
-      message: "Password updated successfully. A confirmation email has been sent."
-    });
+        return res.status(200).json({
+            success: true,
+            message: "Password updated successfully. A confirmation email has been sent."
+        });
 
-  } catch (error) {
-    console.log("Error in changePassword:", error.message);
-    return res.status(500).json({
-      success: false,
-      message: "Something went wrong during password update.",
-      error: error.message
-    });
-  }
+    } catch (error) {
+        console.log("Error in changePassword:", error.message);
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong during password update.",
+            error: error.message
+        });
+    }
 };
